@@ -26,11 +26,47 @@ class Board():
         for row in self.board:
             print(*row)
     
-    def place_words(self): #TODO: Enter Words into the Board
-        word = input("Enter your Word: ").upper()
-        x = input("Enter x coordinate (TOP): ")
-        y = input("Enter y coordinate (LEFT): ")
-        player.del_letters(list(word))    
+    def place_words(self):
+        stop = False
+        while stop != True: # Eingabeschleife
+            testBoard = self.board.copy()
+            word = input("Enter your Word: ").upper()
+            x = input("Enter x coordinate (TOP): ")
+            x = int(x)
+            y = input("Enter y coordinate (LEFT): ")
+            y = int(y)
+            dir = input("Enter Right(r) or Downwards(d): ")
+            
+            if(Board.checkCrossing(dir, y, x, word, self.board)):
+                if dir == "r":
+                    for i in range(len(list(word))): # sideways
+                            testBoard[int(y)][int(x+i)] = ("-" + list(word)[i] + "--")
+                elif dir == "d":
+                    for i in range(len(list(word))): # sideways  
+                            testBoard[int(y)+i][int(x)] = ("-" + list(word)[i] + "--")
+                player.del_letters(list(word))
+                stop = True
+            else:
+                print("Bitte Wort neu eingeben/platzieren")
+        
+    def checkCrossing(dir, cord1, cord2, word, testBoard):
+        if dir == "r":
+            for i in range(len(word)):
+                print("-"+str(*list(word[i]))+"--")
+                if(("-"+str(*list(word[i]))+"--") == testBoard[int(cord1)][int(cord2+i)]):
+                    continue
+                elif("----" != testBoard[int(cord1)][int(cord2+i)]):
+                    print("Gekreuzte Wörter passen nicht überein!")
+                    return False
+        else:
+            for i in range(len(word)):
+                print("-"+str(*list(word[i]))+"--")
+                if(("-"+str(*list(word[i]))+"--") == testBoard[int(cord1+i)][int(cord2)]):
+                    continue
+                elif("----" != testBoard[int(cord1+i)][int(cord2)]):
+                    print("Gekreuzte Wörter passen nicht überein!")
+                    return False
+        return True
 class Letter_sack():
     def __init__(self, numb_letters: int = 100):
         self.numb_letters = numb_letters
