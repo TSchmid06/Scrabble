@@ -1,5 +1,35 @@
 import random, os
 
+class Points():
+    def __init__(self):
+        self.pointDict = pointDict = {
+            "E" : 1, "N" : 1, "S" : 1, "I" : 1, "R" : 1, "T" : 1, "U" : 1, "A" : 1, "D" : 1,
+            "H" : 2, "G" : 2, "L" : 2, "O" : 2,
+            "M" : 3, "B" : 3, "W" : 3, "Z" : 3,
+            "C" : 4, "F" : 4, "K" : 4, "P" : 4,
+            "Ä" : 6, "J" : 6, "Ü" : 6, "V" : 6,
+            "Ö" : 8, "X" : 8,
+            "Q" : 10, "Y" : 10
+        }
+        pass
+    
+    def getWinner(self, players):
+        winner = players[0]
+        for player in players:
+            if player.points > winner.points:
+                winner = player
+        return winner.name
+    
+    def getPointsSack(self, sack):
+        points = []
+        for letter in sack:
+            points.append(self.pointDict[letter])
+        return points
+    def getPointsGame(self, letters):
+        points = 0
+        for letter in letters:
+            points += self.pointDict[letter]
+        return points  
 class Board():
     def __init__(self):
         self.board = [
@@ -37,30 +67,29 @@ class Board():
             y = int(y)
             dir = input("Enter Right(r) or Downwards(d): ")
             
-            if(Board.checkCrossing(dir, y, x, word, self.board)):
+            if(Board.checkCrossing(dir, y, x, word, self.board)):   # wenn crossing nicht passiert oder ok ist
                 if dir == "r":
                     for i in range(len(list(word))): # sideways
                             testBoard[int(y)][int(x+i)] = ("-" + list(word)[i] + "--")
                 elif dir == "d":
                     for i in range(len(list(word))): # sideways  
                             testBoard[int(y)+i][int(x)] = ("-" + list(word)[i] + "--")
-                player.del_letters(list(word))
+                player1.del_letters(list(word))
                 stop = True
             else:
                 print("Bitte Wort neu eingeben/platzieren")
+        player1.points += points.getPointsGame(list(word))
         
     def checkCrossing(dir, cord1, cord2, word, testBoard):
         if dir == "r":
             for i in range(len(word)):
-                print("-"+str(*list(word[i]))+"--")
-                if(("-"+str(*list(word[i]))+"--") == testBoard[int(cord1)][int(cord2+i)]):
+                if(("-"+str(*list(word[i]))+"--") == testBoard[int(cord1)][int(cord2+i)]):  #wenn buchstabe == geplantes feld auf board
                     continue
                 elif("----" != testBoard[int(cord1)][int(cord2+i)]):
                     print("Gekreuzte Wörter passen nicht überein!")
                     return False
         else:
             for i in range(len(word)):
-                print("-"+str(*list(word[i]))+"--")
                 if(("-"+str(*list(word[i]))+"--") == testBoard[int(cord1+i)][int(cord2)]):
                     continue
                 elif("----" != testBoard[int(cord1+i)][int(cord2)]):
@@ -87,6 +116,7 @@ class Letter_sack():
 class Player():
     def __init__(self, name):
         self.name = name
+        self.points = 0
         self.sack = [] # The sack can hold 7 letters
     
     def del_letters(self, letters):
@@ -95,21 +125,33 @@ class Player():
 
 os.system("cls")
 letter_sack = Letter_sack()
-player = Player(input("Enter your Name: "))
+player1 = Player(input("Enter your Name: "))
 board = Board()
+points = Points()
 
 print(len(letter_sack.sack))
 inp = "" # input
 while inp != "e":
     os.system("cls")
     
-    while len(player.sack) < 7:  # Buchstaben an Spieler verteilen
+    while len(player1.sack) < 7:  # Buchstaben an Spieler verteilen
         letter = letter_sack.dist_letter()
-        if letter == 0:
+        if letter == 0 and player1.sack == None:
+            print("Game Over")
+            print(*points.getWinner([player1]))
+            exit()
+        elif letter == 0:
             print("Sack is empty.")
+            inp = input("Want to end the game (y/n)?: ")
+            if inp == "y":
+                print(*points.getWinner([player1]))
+                exit()
             break
-        player.sack.append(letter)
+        
+        player1.sack.append(letter)
     
+    print(player1.name, ":", player1.points)
     board.print_board()
-    print(player.name, ":", *player.sack)
+    print(*player1.sack)
+    print(*points.getPointsSack(player1.sack))
     board.place_words()
