@@ -20,12 +20,13 @@ class Points():
                 winner = player
         return winner.name
     
-    def getPointsSack(self, sack):
+    def getPointsSack(self, sack):  # Analyses the Points of the letter that are currently in possession of the player
         points = []
         for letter in sack:
             points.append(self.pointDict[letter])
         return points
-    def getPointsGame(self, letters):
+    
+    def getPointsGame(self, letters):   # Adds the Points of this turn to the total points of the player
         points = 0
         for letter in letters:
             points += self.pointDict[letter]
@@ -67,12 +68,12 @@ class Board():
             y = int(y)
             dir = input("Enter Right(r) or Downwards(d): ")
             
-            if(Board.checkCrossing(dir, y, x, word, self.board)):   # wenn crossing nicht passiert oder ok ist
+            if(Board.checkCrossing(dir, y, x, word, self.board)):   # if theres no crossing of words or it is ok
                 if dir == "r":
                     for i in range(len(list(word))): # sideways
                             testBoard[int(y)][int(x+i)] = ("-" + list(word)[i] + "--")
                 elif dir == "d":
-                    for i in range(len(list(word))): # sideways  
+                    for i in range(len(list(word))): # down 
                             testBoard[int(y)+i][int(x)] = ("-" + list(word)[i] + "--")
                 player1.del_letters(list(word))
                 stop = True
@@ -80,15 +81,15 @@ class Board():
                 print("Bitte Wort neu eingeben/platzieren")
         player1.points += points.getPointsGame(list(word))
         
-    def checkCrossing(dir, cord1, cord2, word, testBoard):
-        if dir == "r":
+    def checkCrossing(dir, cord1, cord2, word, testBoard):  # Checks if words cross and if it is ok
+        if dir == "r":  # sideways
             for i in range(len(word)):
-                if(("-"+str(*list(word[i]))+"--") == testBoard[int(cord1)][int(cord2+i)]):  #wenn buchstabe == geplantes feld auf board
+                if(("-"+str(*list(word[i]))+"--") == testBoard[int(cord1)][int(cord2+i)]):  #if letter == planned field on the board
                     continue
                 elif("----" != testBoard[int(cord1)][int(cord2+i)]):
                     print("Gekreuzte Wörter passen nicht überein!")
                     return False
-        else:
+        else:   # down
             for i in range(len(word)):
                 if(("-"+str(*list(word[i]))+"--") == testBoard[int(cord1+i)][int(cord2)]):
                     continue
@@ -99,19 +100,19 @@ class Board():
 class Letter_sack():
     def __init__(self, numb_letters: int = 100):
         self.numb_letters = numb_letters
-        self.sack = ["A", "A", "A", "A", "A", "B", "B",  "C", "C", "D",  "D",  "D",  "D", 
+        self.sack = ["A", "A", "A", "A", "A", "B", "B",  "C", "C", "D",  "D",  "D",  "D",   # all the letters in the game
                      "F",  "F", "G",  "G",  "G", "H",  "H",  "H",  "H", "I",  "I",  "I",  "I",  "I",  "I", 
                      "J", "K",  "K", "L",  "L",  "L", "M",  "M",  "M",  "M", "N",  "N",  "N",  "N",  "N",  "N",  "N",  "N",  "N", 
                      "O",  "O",  "O", "P", "Q", "R",  "R",  "R",  "R",  "R",  "R",
                      "S",  "S",  "S",  "S",  "S",  "S",  "S", "T",  "T",  "T",  "T",  "T",  "T",
                      "U",  "U",  "U",  "U",  "U",  "U", "V", "W", "X", "Y", "Z", "Ä", "Ö", "Ü"]
     
-    def dist_letter(self):
-        if len(self.sack) == 0:
+    def dist_letter(self):  # distributes letters to the players
+        if len(self.sack) == 0: # if sack is empty return 0
             return 0
         
         letter = self.sack[random.randint(0, len(self.sack))-1 ]
-        self.sack.remove(letter)
+        self.sack.remove(letter)    # removes chosen letter from the sack
         return letter   
 class Player():
     def __init__(self, name):
@@ -119,7 +120,7 @@ class Player():
         self.points = 0
         self.sack = [] # The sack can hold 7 letters
     
-    def del_letters(self, letters):
+    def del_letters(self, letters): # delete letters from sack after being placed on the board
         for i in range(len(letters)):
             self.sack.remove(letters[i-1])
 
@@ -130,17 +131,16 @@ board = Board()
 points = Points()
 
 print(len(letter_sack.sack))
-inp = "" # input
-while inp != "e":
+while True:
     os.system("cls")
     
-    while len(player1.sack) < 7:  # Buchstaben an Spieler verteilen
+    while len(player1.sack) < 7:  # Distribute letters to players
         letter = letter_sack.dist_letter()
-        if letter == 0 and player1.sack == None:
+        if letter == 0 and player1.sack == None:    # if sack and player sack is empty = game over
             print("Game Over")
             print(*points.getWinner([player1]))
             exit()
-        elif letter == 0:
+        elif letter == 0:   # if sack is empty you can choose if you want to keep playing
             print("Sack is empty.")
             inp = input("Want to end the game (y/n)?: ")
             if inp == "y":
@@ -153,5 +153,5 @@ while inp != "e":
     print(player1.name, ":", player1.points)
     board.print_board()
     print(*player1.sack)
-    print(*points.getPointsSack(player1.sack))
+    print(*points.getPointsSack(player1.sack))  # Print Points of the letters currently in Players possession
     board.place_words()
