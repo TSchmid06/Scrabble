@@ -57,18 +57,26 @@ class Board():
         for row in self.board:
             print(*row)
     
-    def place_words(self):
+    def place_words(self, sack):
         stop = False
-        while stop != True: # Eingabeschleife
+        while True: # Eingabeschleife
             testBoard = self.board.copy()
-            word = input("Enter your Word: ").upper()
-            x = input("Enter x coordinate (TOP): ")
-            x = int(x)
-            y = input("Enter y coordinate (LEFT): ")
-            y = int(y)
-            dir = input("Enter Right(r) or Downwards(d): ")
+            while True:
+                try:    # wenn falsch, neu eingeben
+                    word = input("Enter your Word: ").upper()
+                    x = int(input("Enter x coordinate (TOP): "))
+                    y = int(input("Enter y coordinate (LEFT): "))
+                    dir = str(input("Enter Right(r) or Downwards(d): "))
+                    break
+                except ValueError:
+                    print("Not the right Value. Please try again.")
+                
+            for i in list(word):
+                if i not in sack:
+                    print("Letters are not in Sack. Please try again.")
+                    break
             
-            if(Board.checkCrossing(dir, y, x, word, self.board)):   # if theres no crossing of words or it is ok
+            if(Board.checkCrossing(dir, y, x, word, self.board) and (dir == "r" or dir == "d")):   # if theres no crossing of words or it is ok AND dir = "r" or "d"
                 if dir == "r":
                     for i in range(len(list(word))): # sideways
                             testBoard[int(y)][int(x+i)] = ("-" + list(word)[i] + "--")
@@ -76,10 +84,10 @@ class Board():
                     for i in range(len(list(word))): # down 
                             testBoard[int(y)+i][int(x)] = ("-" + list(word)[i] + "--")
                 player1.del_letters(list(word))
-                stop = True
+                player1.points += points.getPointsGame(list(word))
+                break
             else:
-                print("Bitte Wort neu eingeben/platzieren")
-        player1.points += points.getPointsGame(list(word))
+                print("Please try again.")
         
     def checkCrossing(dir, cord1, cord2, word, testBoard):  # Checks if words cross and if it is ok
         if dir == "r":  # sideways
@@ -87,14 +95,14 @@ class Board():
                 if(("-"+str(*list(word[i]))+"--") == testBoard[int(cord1)][int(cord2+i)]):  #if letter == planned field on the board
                     continue
                 elif("----" != testBoard[int(cord1)][int(cord2+i)]):
-                    print("Gekreuzte Wörter passen nicht überein!")
+                    print("Crossed words don't fit.")
                     return False
         else:   # down
             for i in range(len(word)):
                 if(("-"+str(*list(word[i]))+"--") == testBoard[int(cord1+i)][int(cord2)]):
                     continue
                 elif("----" != testBoard[int(cord1+i)][int(cord2)]):
-                    print("Gekreuzte Wörter passen nicht überein!")
+                    print("Crossed words don't fit.")
                     return False
         return True
 class Letter_sack():
@@ -154,4 +162,4 @@ while True:
     board.print_board()
     print(*player1.sack)
     print(*points.getPointsSack(player1.sack))  # Print Points of the letters currently in Players possession
-    board.place_words()
+    board.place_words(player1.sack)
