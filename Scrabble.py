@@ -57,7 +57,7 @@ class Board():
         for row in self.board:
             print(*row)
     
-    def place_words(self, sack):
+    def place_words(self, sack, player):
         stop = False
         while True: # Eingabeschleife
             testBoard = self.board.copy()
@@ -83,8 +83,8 @@ class Board():
                 elif dir == "d":
                     for i in range(len(list(word))): # down 
                             testBoard[int(y)+i][int(x)] = ("-" + list(word)[i] + "--")
-                player1.del_letters(list(word))
-                player1.points += points.getPointsGame(list(word))
+                player.del_letters(list(word))
+                player.points += points.getPointsGame(list(word))
                 break
             else:
                 print("Please try again.")
@@ -108,12 +108,13 @@ class Board():
 class Letter_sack():
     def __init__(self, numb_letters: int = 100):
         self.numb_letters = numb_letters
-        self.sack = ["A", "A", "A", "A", "A", "B", "B",  "C", "C", "D",  "D",  "D",  "D",   # all the letters in the game
-                     "F",  "F", "G",  "G",  "G", "H",  "H",  "H",  "H", "I",  "I",  "I",  "I",  "I",  "I", 
-                     "J", "K",  "K", "L",  "L",  "L", "M",  "M",  "M",  "M", "N",  "N",  "N",  "N",  "N",  "N",  "N",  "N",  "N", 
-                     "O",  "O",  "O", "P", "Q", "R",  "R",  "R",  "R",  "R",  "R",
-                     "S",  "S",  "S",  "S",  "S",  "S",  "S", "T",  "T",  "T",  "T",  "T",  "T",
-                     "U",  "U",  "U",  "U",  "U",  "U", "V", "W", "X", "Y", "Z", "Ä", "Ö", "Ü"]
+        self.sack = ["A", "A", "A", "A", "A"]
+        # self.sack = ["A", "A", "A", "A", "A", "B", "B",  "C", "C", "D",  "D",  "D",  "D",   # all the letters in the game
+        #              "F",  "F", "G",  "G",  "G", "H",  "H",  "H",  "H", "I",  "I",  "I",  "I",  "I",  "I", 
+        #              "J", "K",  "K", "L",  "L",  "L", "M",  "M",  "M",  "M", "N",  "N",  "N",  "N",  "N",  "N",  "N",  "N",  "N", 
+        #              "O",  "O",  "O", "P", "Q", "R",  "R",  "R",  "R",  "R",  "R",
+        #              "S",  "S",  "S",  "S",  "S",  "S",  "S", "T",  "T",  "T",  "T",  "T",  "T",
+        #              "U",  "U",  "U",  "U",  "U",  "U", "V", "W", "X", "Y", "Z", "Ä", "Ö", "Ü"]
     
     def dist_letter(self):  # distributes letters to the players
         if len(self.sack) == 0: # if sack is empty return 0
@@ -134,32 +135,44 @@ class Player():
 
 os.system("cls")
 letter_sack = Letter_sack()
-player1 = Player(input("Enter your Name: "))
 board = Board()
 points = Points()
+players = []
+#i = int(input("Enter Number of Players: "))
+
+while True:
+    inp = input("Enter Number of Players: ")
+    if inp.isnumeric():
+        if int(inp)<4 and int(inp)>1:
+            for i in range(int(inp)):
+                player = Player(input("Player " + str(i+1) + ", Enter your Name: "))
+                players.append(player)
+            break
 
 print(len(letter_sack.sack))
-while True:
-    os.system("cls")
-    
-    while len(player1.sack) < 7:  # Distribute letters to players
-        letter = letter_sack.dist_letter()
-        if letter == 0 and player1.sack == None:    # if sack and player sack is empty = game over
-            print("Game Over")
-            print(*points.getWinner([player1]))
-            exit()
-        elif letter == 0:   # if sack is empty you can choose if you want to keep playing
-            print("Sack is empty.")
-            inp = input("Want to end the game (y/n)?: ")
-            if inp == "y":
-                print(*points.getWinner([player1]))
-                exit()
-            break
+
+while True: #game
+    for player in players: #round
+        os.system("cls")
         
-        player1.sack.append(letter)
-    
-    print(player1.name, ":", player1.points)
-    board.print_board()
-    print(*player1.sack)
-    print(*points.getPointsSack(player1.sack))  # Print Points of the letters currently in Players possession
-    board.place_words(player1.sack)
+        while len(player.sack) < 7:  # Distribute letters to players
+            letter = letter_sack.dist_letter()
+            if letter == 0 and len(player.sack) == 0:    # if sack and player sack is empty = game over
+                print("Game Over")
+                print("Winner: ", *points.getWinner(players))
+                exit()
+            elif letter == 0:   # if sack is empty you can choose if you want to keep playing
+                print("Sack is empty.")
+                inp = input("Want to end the game (y/n)?: ")
+                if inp == "y":
+                    print("Winner: ", *points.getWinner(players))
+                    exit()
+                break
+            
+            player.sack.append(letter)
+        
+        print(player.name, ":", player.points)
+        board.print_board()
+        print(*player.sack)
+        print(*points.getPointsSack(player.sack))  # Print Points of the letters currently in Players possession
+        board.place_words(player.sack, player)
