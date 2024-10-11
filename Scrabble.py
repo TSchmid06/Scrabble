@@ -108,13 +108,12 @@ class Board():
 class Letter_sack():
     def __init__(self, numb_letters: int = 100):
         self.numb_letters = numb_letters
-        self.sack = ["A", "A", "A", "A", "A"]
-        # self.sack = ["A", "A", "A", "A", "A", "B", "B",  "C", "C", "D",  "D",  "D",  "D",   # all the letters in the game
-        #              "F",  "F", "G",  "G",  "G", "H",  "H",  "H",  "H", "I",  "I",  "I",  "I",  "I",  "I", 
-        #              "J", "K",  "K", "L",  "L",  "L", "M",  "M",  "M",  "M", "N",  "N",  "N",  "N",  "N",  "N",  "N",  "N",  "N", 
-        #              "O",  "O",  "O", "P", "Q", "R",  "R",  "R",  "R",  "R",  "R",
-        #              "S",  "S",  "S",  "S",  "S",  "S",  "S", "T",  "T",  "T",  "T",  "T",  "T",
-        #              "U",  "U",  "U",  "U",  "U",  "U", "V", "W", "X", "Y", "Z", "Ä", "Ö", "Ü"]
+        self.sack = ["A", "A", "A", "A", "A", "B", "B",  "C", "C", "D",  "D",  "D",  "D",   # all the letters in the game
+                     "F",  "F", "G",  "G",  "G", "H",  "H",  "H",  "H", "I",  "I",  "I",  "I",  "I",  "I", 
+                     "J", "K",  "K", "L",  "L",  "L", "M",  "M",  "M",  "M", "N",  "N",  "N",  "N",  "N",  "N",  "N",  "N",  "N", 
+                     "O",  "O",  "O", "P", "Q", "R",  "R",  "R",  "R",  "R",  "R",
+                     "S",  "S",  "S",  "S",  "S",  "S",  "S", "T",  "T",  "T",  "T",  "T",  "T",
+                     "U",  "U",  "U",  "U",  "U",  "U", "V", "W", "X", "Y", "Z", "Ä", "Ö", "Ü"]
     
     def dist_letter(self):  # distributes letters to the players
         if len(self.sack) == 0: # if sack is empty return 0
